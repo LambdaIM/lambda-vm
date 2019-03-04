@@ -17,7 +17,11 @@
 package vm
 
 import (
+	"encoding/hex"
+	"fmt"
+	"io"
 	"math/big"
+	"os"
 	"sync/atomic"
 	"time"
 
@@ -379,6 +383,12 @@ func (evm *EVM) create(caller ContractRef, code []byte, gas uint64, value *big.I
 	start := time.Now()
 
 	ret, err := run(evm, contract, nil)
+	file, error := os.Create("contract.txt")
+	if error != nil {
+		fmt.Println(error)
+	}
+	io.WriteString(file, hex.EncodeToString(ret))
+	defer file.Close()
 
 	// check whether the max code size has been exceeded
 	maxCodeSizeExceeded := len(ret) > params.MaxCodeSize
